@@ -6,8 +6,8 @@ import {
     getDataForDimension,
     getDataForDateRange,
 } from '../../analytics-data/analytics-data.service';
-import { TriggerConfig, DimensionFilter } from '../trigger-notification.const';
-import { percentageFormatter } from '../trigger-notification.service';
+import { TriggerConfig, DimensionFilter } from '../alert.const';
+import { percentageFormatter } from '../alert.service';
 import {
     SingleMetric,
     active7DayUsers,

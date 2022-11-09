@@ -7,7 +7,7 @@ import {
     runReport,
     getDataForDateRange,
 } from '../../analytics-data/analytics-data.service';
-import { TriggerConfig, DimensionFilter } from '../trigger-notification.const';
+import { TriggerConfig, DimensionFilter } from '../alert.const';
 
 type TopDimensionReportOptions = {
     name: string;
