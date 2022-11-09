@@ -6,12 +6,14 @@ const channel = 'C04AGMYPH3K';
 
 export const createPlainTextSection = (text: string) => ({
     type: 'section',
-    text: {
-        text,
-        type: 'plain_text',
-    },
+    text: { text, type: 'plain_text' },
 });
 
 export const postMessage = (
     options: Omit<ChatPostMessageArguments, 'channel'>,
-) => client.chat.postMessage({ ...options, channel });
+) =>
+    client.chat.postMessage({
+        ...options,
+        text: 'redgifs-notification',
+        channel,
+    });
