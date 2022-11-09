@@ -98,6 +98,7 @@ export const weeklyLoggedInUsers = singleMetricReport({
 export const dailyReddit = singleMetricReport({
     metrics: [SingleMetric.totalUsers],
     config: TriggerConfig.DAILY,
+    filterExpressions: [DimensionFilter.REDDIT],
 });
 
 export const dailyGIFViewsReddit = singleMetricReport({

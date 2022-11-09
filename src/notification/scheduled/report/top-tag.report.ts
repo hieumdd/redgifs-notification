@@ -9,12 +9,12 @@ import {
 import { scheduledDateRanges } from '../scheduled.const';
 import { DimensionFilter } from '../../notification.filter';
 
-type TopDimensionReportOptions = {
+type TopTagReportOptions = {
     name: string;
     dimensionFilter?: IFilterExpression;
 };
 
-const topDimensionReport = (options: TopDimensionReportOptions) => {
+const topTagReport = (options: TopTagReportOptions) => {
     return async () => {
         const response = await runReport({
             dateRanges: [scheduledDateRanges[0]],
@@ -41,11 +41,11 @@ const topDimensionReport = (options: TopDimensionReportOptions) => {
     };
 };
 
-export const generic = topDimensionReport({
+export const generic = topTagReport({
     name: 'Top Tags',
 });
 
-export const reddit = topDimensionReport({
+export const reddit = topTagReport({
     name: 'Top Tags from Reddit',
     dimensionFilter: DimensionFilter.REDDIT,
 });

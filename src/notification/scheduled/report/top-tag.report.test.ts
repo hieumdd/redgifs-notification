@@ -1,4 +1,4 @@
-import { generic, reddit } from './top-dimension.report';
+import { generic, reddit } from './top-tag.report';
 
 describe('Scheduled Top Dimension Report', () => {
     const cases: [string, () => Promise<string[]>][] = [

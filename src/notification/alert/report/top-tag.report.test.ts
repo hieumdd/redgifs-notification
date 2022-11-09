@@ -1,6 +1,6 @@
-import { daily, dailyReddit } from './tag-name.report';
+import { daily, dailyReddit } from './top-tag.report';
 
-describe('Alert Tag Name', () => {
+describe('Alert Top Tag', () => {
     const cases: [string, () => Promise<string[]>][] = [
         ['daily', daily],
         ['daily-reddit', dailyReddit],

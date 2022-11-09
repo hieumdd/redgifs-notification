@@ -11,13 +11,13 @@ import { Metric } from '../../../analytics-data/metric.enum';
 import { TriggerConfig } from '../alert.const';
 import { DimensionFilter } from '../../notification.filter';
 
-type TagNameReportOptions = {
+type TopTagReportOptions = {
     name: string;
     config: typeof TriggerConfig[keyof typeof TriggerConfig];
     filterExpressions?: IFilterExpression[];
 };
 
-const TagNameReport = (options: TagNameReportOptions) => {
+const TopTagReport = (options: TopTagReportOptions) => {
     const { name, config, filterExpressions } = options;
 
     return async () => {
@@ -56,23 +56,23 @@ const TagNameReport = (options: TagNameReportOptions) => {
     };
 };
 
-export const daily = TagNameReport({
+export const daily = TopTagReport({
     name: 'Top 3 tags',
     config: TriggerConfig.DAILY,
 });
 
-export const weekly = TagNameReport({
+export const weekly = TopTagReport({
     name: 'Top 3 tags',
     config: TriggerConfig.WEEKLY,
 });
 
-export const dailyReddit = TagNameReport({
+export const dailyReddit = TopTagReport({
     name: 'Top 3 tags from Reddit',
     config: TriggerConfig.DAILY,
     filterExpressions: [DimensionFilter.REDDIT],
 });
 
-export const weeklyReddit = TagNameReport({
+export const weeklyReddit = TopTagReport({
     name: 'Top 3 tags from Reddit',
     config: TriggerConfig.WEEKLY,
     filterExpressions: [DimensionFilter.REDDIT],

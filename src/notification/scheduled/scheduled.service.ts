@@ -1,9 +1,9 @@
 import * as SingleMetric from './report/single-metric.report';
-import * as TopDimension from './report/top-dimension.report';
+import * as TopTag from './report/top-tag.report';
 
 export const scheduleds = [
     SingleMetric.generic,
     SingleMetric.reddit,
-    TopDimension.generic,
-    TopDimension.reddit,
+    TopTag.generic,
+    TopTag.reddit,
 ];

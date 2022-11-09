@@ -12,16 +12,25 @@ import { scheduledDateRanges } from '../scheduled.const';
 import * as SingleMetric from '../../../analytics-data/metric.const';
 
 type SingleMetricReportOptions = {
+    metrics: SingleMetric.SingleMetric[];
+    filterExpressions?: IFilterExpression[];
     dimensionFilter?: IFilterExpression;
 };
 
-const singleMetricReport = (options?: SingleMetricReportOptions) => {
+const singleMetricReport = (options: SingleMetricReportOptions) => {
+    const { metrics, filterExpressions } = options;
+
     return async () => {
-        const metrics = [SingleMetric.totalUsers];
         const response = await runReport({
             dateRanges: scheduledDateRanges,
-            metrics: metrics.map((metric) => ({ name: metric.key })),
-            dimensionFilter: options?.dimensionFilter,
+            metrics: options.metrics.map((metric) => ({ name: metric.key })),
+            dimensionFilter: filterExpressions
+                ? {
+                      andGroup: {
+                          expressions: filterExpressions,
+                      },
+                  }
+                : undefined,
         });
 
         return metrics.map((metric) => {
@@ -45,8 +54,19 @@ const singleMetricReport = (options?: SingleMetricReportOptions) => {
     };
 };
 
-export const generic = singleMetricReport();
+export const generic = singleMetricReport({
+    metrics: [
+        SingleMetric.totalUsers,
+        SingleMetric.pageViews,
+        SingleMetric.sessionDuration,
+    ],
+});
 
 export const reddit = singleMetricReport({
-    dimensionFilter: DimensionFilter.REDDIT,
+    metrics: [
+        SingleMetric.totalUsersReddit,
+        SingleMetric.pageViewsReddit,
+        SingleMetric.sessionDurationReddit,
+    ],
+    filterExpressions: [DimensionFilter.REDDIT],
 });

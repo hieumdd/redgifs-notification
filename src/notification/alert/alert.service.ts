@@ -1,5 +1,5 @@
 import * as SingleMetric from './report/single-metric.report';
-import * as TagName from './report/tag-name.report';
+import * as TopTag from './report/top-tag.report';
 
 export const daily = [
     SingleMetric.daily,
@@ -8,8 +8,8 @@ export const daily = [
     SingleMetric.dailyReddit,
     SingleMetric.dailyGIFViewsReddit,
     SingleMetric.dailyLoggedInUsersReddit,
-    TagName.daily,
-    TagName.dailyReddit,
+    TopTag.daily,
+    TopTag.dailyReddit,
 ];
 
 export const weekly = [
@@ -19,6 +19,6 @@ export const weekly = [
     SingleMetric.weeklyReddit,
     SingleMetric.weeklyGIFViewsReddit,
     SingleMetric.weeklyLoggedInUsersReddit,
-    TagName.weekly,
-    TagName.weeklyReddit,
+    TopTag.weekly,
+    TopTag.weeklyReddit,
 ];
