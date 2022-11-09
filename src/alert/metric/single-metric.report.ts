@@ -8,14 +8,10 @@ import {
 } from '../../analytics-data/analytics-data.service';
 import { TriggerConfig, DimensionFilter } from '../alert.const';
 import { percentageFormatter } from '../alert.service';
-import {
-    SingleMetric,
-    active7DayUsers,
-    totalUsers,
-} from './single-metric.const';
+import * as SingleMetric from './single-metric.const';
 
 type SingleMetricReportOptions = {
-    metrics: SingleMetric[];
+    metrics: SingleMetric.SingleMetric[];
     threshold: number;
     config: typeof TriggerConfig[keyof typeof TriggerConfig];
     dimensionFilter?: IFilterExpression;
@@ -53,13 +49,33 @@ const singleMetricReport = (options: SingleMetricReportOptions) => {
 };
 
 export const daily = singleMetricReport({
-    metrics: [active7DayUsers],
+    metrics: [
+        SingleMetric.active7DayUsers,
+        SingleMetric.active28DayUsers,
+        SingleMetric.totalUsers,
+    ],
+    threshold: 0.05,
+    config: TriggerConfig.DAILY,
+});
+
+export const weekly = singleMetricReport({
+    metrics: [
+        SingleMetric.active7DayUsers,
+        SingleMetric.active28DayUsers,
+        SingleMetric.totalUsers,
+    ],
+    threshold: 0.1,
+    config: TriggerConfig.WEEKLY,
+});
+
+export const dailyReddit = singleMetricReport({
+    metrics: [SingleMetric.totalUsers],
     threshold: 0.05,
     config: TriggerConfig.DAILY,
 });
 
 export const weeklyReddit = singleMetricReport({
-    metrics: [totalUsers],
+    metrics: [SingleMetric.totalUsers],
     threshold: 0.05,
     config: TriggerConfig.WEEKLY,
     dimensionFilter: DimensionFilter.REDDIT,

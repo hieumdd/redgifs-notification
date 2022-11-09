@@ -19,9 +19,19 @@ export const alertService = (options: AlertOptions) => async () => {
 };
 
 export const daily = alertService({
-    reports: [SingleMetric.daily, TopDimension.daily, TopDimension.dailyReddit],
+    reports: [
+        SingleMetric.daily,
+        SingleMetric.dailyReddit,
+        TopDimension.daily,
+        TopDimension.dailyReddit,
+    ],
 });
 
 export const weekly = alertService({
-    reports: [SingleMetric.weeklyReddit],
+    reports: [
+        SingleMetric.weekly,
+        SingleMetric.weeklyReddit,
+        TopDimension.weekly,
+        TopDimension.weeklyReddit,
+    ],
 });

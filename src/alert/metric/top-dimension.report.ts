@@ -57,8 +57,19 @@ export const daily = topDimensionReport({
     config: TriggerConfig.DAILY,
 });
 
+export const weekly = topDimensionReport({
+    name: 'Top 3 tags',
+    config: TriggerConfig.WEEKLY,
+});
+
 export const dailyReddit = topDimensionReport({
     name: 'Top 3 tags from Reddit',
     config: TriggerConfig.DAILY,
+    dimensionFilter: DimensionFilter.REDDIT,
+});
+
+export const weeklyReddit = topDimensionReport({
+    name: 'Top 3 tags from Reddit',
+    config: TriggerConfig.WEEKLY,
     dimensionFilter: DimensionFilter.REDDIT,
 });
