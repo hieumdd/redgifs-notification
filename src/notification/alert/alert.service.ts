@@ -1,16 +1,24 @@
 import * as SingleMetric from './report/single-metric.report';
-import * as TopDimension from './report/top-dimension.report';
+import * as TagName from './report/tag-name.report';
 
 export const daily = [
     SingleMetric.daily,
+    SingleMetric.dailyGIFViews,
+    SingleMetric.dailyLoggedInUsers,
     SingleMetric.dailyReddit,
-    TopDimension.daily,
-    TopDimension.dailyReddit,
+    SingleMetric.dailyGIFViewsReddit,
+    SingleMetric.dailyLoggedInUsersReddit,
+    TagName.daily,
+    TagName.dailyReddit,
 ];
 
 export const weekly = [
     SingleMetric.weekly,
+    SingleMetric.weeklyGIFViews,
+    SingleMetric.weeklyLoggedInUsers,
     SingleMetric.weeklyReddit,
-    TopDimension.weekly,
-    TopDimension.weeklyReddit,
+    SingleMetric.weeklyGIFViewsReddit,
+    SingleMetric.weeklyLoggedInUsersReddit,
+    TagName.weekly,
+    TagName.weeklyReddit,
 ];

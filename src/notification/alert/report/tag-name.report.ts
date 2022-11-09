@@ -11,21 +11,27 @@ import { Metric } from '../../../analytics-data/metric.enum';
 import { TriggerConfig } from '../alert.const';
 import { DimensionFilter } from '../../notification.filter';
 
-type TopDimensionReportOptions = {
+type TagNameReportOptions = {
     name: string;
     config: typeof TriggerConfig[keyof typeof TriggerConfig];
-    dimensionFilter?: IFilterExpression;
+    filterExpressions?: IFilterExpression[];
 };
 
-const topDimensionReport = (options: TopDimensionReportOptions) => {
-    const { name, config, dimensionFilter } = options;
+const TagNameReport = (options: TagNameReportOptions) => {
+    const { name, config, filterExpressions } = options;
 
     return async () => {
         const response = await runReport({
             dateRanges: config.dateRanges,
             dimensions: [{ name: 'customEvent:tag_name' }],
             metrics: [{ name: Metric.EVENT_COUNT }],
-            dimensionFilter,
+            dimensionFilter: filterExpressions
+                ? {
+                      andGroup: {
+                          expressions: filterExpressions,
+                      },
+                  }
+                : undefined,
         });
 
         const [dateRange0, dateRange1] = [0, 1]
@@ -50,24 +56,24 @@ const topDimensionReport = (options: TopDimensionReportOptions) => {
     };
 };
 
-export const daily = topDimensionReport({
+export const daily = TagNameReport({
     name: 'Top 3 tags',
     config: TriggerConfig.DAILY,
 });
 
-export const weekly = topDimensionReport({
+export const weekly = TagNameReport({
     name: 'Top 3 tags',
     config: TriggerConfig.WEEKLY,
 });
 
-export const dailyReddit = topDimensionReport({
+export const dailyReddit = TagNameReport({
     name: 'Top 3 tags from Reddit',
     config: TriggerConfig.DAILY,
-    dimensionFilter: DimensionFilter.REDDIT,
+    filterExpressions: [DimensionFilter.REDDIT],
 });
 
-export const weeklyReddit = topDimensionReport({
+export const weeklyReddit = TagNameReport({
     name: 'Top 3 tags from Reddit',
     config: TriggerConfig.WEEKLY,
-    dimensionFilter: DimensionFilter.REDDIT,
+    filterExpressions: [DimensionFilter.REDDIT],
 });
