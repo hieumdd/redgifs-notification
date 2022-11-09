@@ -5,10 +5,11 @@ import {
     runReport,
     getDataForDimension,
     getDataForDateRange,
-} from '../../analytics-data/analytics-data.service';
-import { TriggerConfig, DimensionFilter } from '../alert.const';
-import { percentageFormatter } from '../alert.service';
-import * as SingleMetric from './single-metric.const';
+} from '../../../analytics-data/analytics-data.service';
+import { TriggerConfig } from '../alert.const';
+import { DimensionFilter } from '../../notification.filter';
+import { percentageFormatter } from '../../notification.service';
+import * as SingleMetric from '../../../analytics-data/metric.const';
 
 type SingleMetricReportOptions = {
     metrics: SingleMetric.SingleMetric[];
@@ -39,7 +40,7 @@ const singleMetricReport = (options: SingleMetricReportOptions) => {
 
                 const figure = (dateRange0 - dateRange1) / dateRange1;
 
-                if (figure > -threshold) return;
+                // if (figure > -threshold) return;
 
                 const prettyFigure = percentageFormatter.format(figure);
                 return `${metric.name} has gone down by ${prettyFigure} from ${config.suffix}`;

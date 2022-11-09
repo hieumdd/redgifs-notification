@@ -1,6 +1,7 @@
 import { BetaAnalyticsDataClient, protos } from '@google-analytics/data';
 import IRunReportRequest = protos.google.analytics.data.v1beta.IRunReportRequest;
 import RunReportResponse = protos.google.analytics.data.v1beta.IRunReportResponse;
+import IRow = protos.google.analytics.data.v1beta.IRow;
 
 export const client = new BetaAnalyticsDataClient();
 
@@ -41,4 +42,9 @@ export const getDataForDateRange = (
             (dimensionValue) => dimensionValue.value === dateRangeValue,
         ),
     );
+};
+
+export const sortDimensionValue = ({ metricValues }: IRow) => {
+    const value = [...(metricValues || [])].pop()?.value;
+    return parseInt(value || '0');
 };
