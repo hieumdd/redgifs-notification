@@ -29,4 +29,24 @@ export const DimensionFilter: { [key: string]: IFilterExpression } = {
             },
         },
     },
+    LOGGED_IN: {
+        filter: {
+            fieldName: 'customEvent:is_user_logged_in',
+            stringFilter: {
+                matchType: 'EXACT',
+                value: 'true',
+                caseSensitive: false,
+            },
+        },
+    },
+    GIF_VIEW: {
+        filter: {
+            fieldName: 'eventName',
+            stringFilter: {
+                matchType: 'EXACT',
+                value: 'gif_view',
+                caseSensitive: false,
+            },
+        },
+    },
 };

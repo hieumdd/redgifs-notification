@@ -7,6 +7,7 @@ import {
     getDataForDateRange,
     sortDimensionValue,
 } from '../../../analytics-data/analytics-data.service';
+import { Metric } from '../../../analytics-data/metric.enum';
 import { TriggerConfig } from '../alert.const';
 import { DimensionFilter } from '../../notification.filter';
 
@@ -23,7 +24,7 @@ const topDimensionReport = (options: TopDimensionReportOptions) => {
         const response = await runReport({
             dateRanges: config.dateRanges,
             dimensions: [{ name: 'customEvent:tag_name' }],
-            metrics: [{ name: 'eventCount' }],
+            metrics: [{ name: Metric.EVENT_COUNT }],
             dimensionFilter,
         });
 
