@@ -25,22 +25,42 @@ export const totalUsersReddit: SingleMetric = {
     key: Metric.TOTAL_USERS,
 };
 
+export const loggedInUsers: SingleMetric = {
+    name: 'Logged In Users',
+    key: Metric.TOTAL_USERS,
+};
+
+export const loggedInUsersReddit: SingleMetric = {
+    name: 'Logged In Users from Reddit',
+    key: Metric.TOTAL_USERS,
+};
+
+export const gifViews: SingleMetric = {
+    name: 'GIF Views',
+    key: Metric.EVENT_COUNT,
+};
+
+export const gifViewsReddit: SingleMetric = {
+    name: 'GIF Views from Reddit',
+    key: Metric.EVENT_COUNT,
+};
+
 export const pageViews: SingleMetric = {
     name: 'Page Views',
     key: Metric.SCREEN_PAGE_VIEWS,
-}
+};
 
 export const pageViewsReddit: SingleMetric = {
     name: 'Page Views from Reddit',
     key: Metric.SCREEN_PAGE_VIEWS,
-}
+};
 
 export const sessionDuration: SingleMetric = {
     name: 'Session Duration',
     key: Metric.AVERAGE_SESSION_DURATION,
-}
+};
 
 export const sessionDurationReddit: SingleMetric = {
     name: 'Session Duration from Reddit',
     key: Metric.AVERAGE_SESSION_DURATION,
-}
+};
