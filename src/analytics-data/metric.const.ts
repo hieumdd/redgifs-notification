@@ -45,6 +45,16 @@ export const gifViewsReddit: SingleMetric = {
     key: Metric.EVENT_COUNT,
 };
 
+export const gifViewsPerSession: SingleMetric = {
+    name: 'GIF Views per Session',
+    key: Metric.EVENT_COUNT,
+};
+
+export const gifViewsPerSessionReddit: SingleMetric = {
+    name: 'GIF Views per Session from Reddit',
+    key: Metric.EVENT_COUNT,
+};
+
 export const pageViews: SingleMetric = {
     name: 'Page Views',
     key: Metric.SCREEN_PAGE_VIEWS,
@@ -53,6 +63,11 @@ export const pageViews: SingleMetric = {
 export const pageViewsReddit: SingleMetric = {
     name: 'Page Views from Reddit',
     key: Metric.SCREEN_PAGE_VIEWS,
+};
+
+export const sessions: SingleMetric = {
+    name: 'Sessions',
+    key: Metric.SESSIONS,
 };
 
 export const sessionDuration: SingleMetric = {

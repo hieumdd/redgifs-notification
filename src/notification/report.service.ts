@@ -11,9 +11,10 @@ export const [singleMetric, singleMetricReddit] = (() => {
                 dateRanges,
                 metrics: [
                     Metric.ACTIVE_7_DAY_USERS,
-                    Metric.TOTAL_USERS,
-                    Metric.SCREEN_PAGE_VIEWS,
                     Metric.AVERAGE_SESSION_DURATION,
+                    Metric.SCREEN_PAGE_VIEWS,
+                    Metric.SESSIONS,
+                    Metric.TOTAL_USERS,
                 ].map((metric) => ({ name: metric })),
                 dimensionFilter,
             });
@@ -59,6 +60,12 @@ export const [topTag, topTagReddit] = (() => {
                 dimensions: [{ name: 'customEvent:tag_name' }],
                 metrics: [{ name: Metric.EVENT_COUNT }],
                 dimensionFilter,
+                orderBys: [
+                    {
+                        desc: true,
+                        metric: { metricName: Metric.EVENT_COUNT },
+                    },
+                ],
             });
         };
     });

@@ -2,7 +2,12 @@ import * as SingleMetric from '../analytics-data/metric.const';
 import { createPlainTextSection, postMessage } from '../slack/slack.service';
 import { TODAY, YESTERDAY, THIS_MONTH } from './date-range.const';
 import { getReports } from './report.service';
-import { reportDimension, reportMetric } from './scheduled.processor';
+import {
+    reportDimension,
+    reportMetric,
+    reportMetricValue,
+    reportMetricDivision,
+} from './scheduled.processor';
 
 export const scheduled = async () => {
     const dateRanges = [TODAY, YESTERDAY, THIS_MONTH];
@@ -28,6 +33,42 @@ export const scheduled = async () => {
         reportMetric(
             responses.gifViewsRedditResponse,
             SingleMetric.gifViewsReddit,
+        ),
+    ];
+
+    const [sessionsFigures, sessionsRedditFigures] = [
+        reportMetricValue(
+            responses.singleMetricResponse,
+            SingleMetric.sessions,
+        ),
+        reportMetricValue(
+            responses.singleMetricRedditResponse,
+            SingleMetric.sessions,
+        ),
+    ];
+
+    const [gifViewsPerSessions, gifViewsPerSessionsReddit] = [
+        reportMetricDivision(
+            reportMetricValue(
+                responses.singleMetricResponse,
+                SingleMetric.sessions,
+            ),
+            reportMetricValue(
+                responses.singleMetricResponse,
+                SingleMetric.sessions,
+            ),
+            SingleMetric.gifViewsPerSession,
+        ),
+        reportMetricDivision(
+            reportMetricValue(
+                responses.singleMetricRedditResponse,
+                SingleMetric.sessions,
+            ),
+            reportMetricValue(
+                responses.singleMetricRedditResponse,
+                SingleMetric.sessions,
+            ),
+            SingleMetric.gifViewsPerSessionReddit,
         ),
     ];
 
@@ -58,7 +99,8 @@ export const scheduled = async () => {
         sessionDurationReddit,
         gifViews,
         gifViewsReddit,
-
+        gifViewsPerSessions,
+        gifViewsPerSessionsReddit,
         loggedInUsers,
         loggedInUsersReddit,
 

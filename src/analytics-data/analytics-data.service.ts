@@ -1,6 +1,6 @@
 import { BetaAnalyticsDataClient, protos } from '@google-analytics/data';
 import IRunReportRequest = protos.google.analytics.data.v1beta.IRunReportRequest;
-import RunReportResponse = protos.google.analytics.data.v1beta.IRunReportResponse;
+import IRunReportResponse = protos.google.analytics.data.v1beta.IRunReportResponse;
 import IRow = protos.google.analytics.data.v1beta.IRow;
 
 export const client = new BetaAnalyticsDataClient();
@@ -11,12 +11,13 @@ export const runReport = (request: IRunReportRequest) =>
     client
         .runReport({
             property: `properties/${PROPERTY_ID}`,
+            returnPropertyQuota: true,
             ...request,
         })
         .then(([response]) => response);
 
 export const getDataForDimension = (
-    response: RunReportResponse,
+    response: IRunReportResponse,
     dimension: string,
 ) => {
     const index = response.metricHeaders?.findIndex(
@@ -32,7 +33,7 @@ export const getDataForDimension = (
 };
 
 export const getDataForDateRange = (
-    response: RunReportResponse,
+    response: IRunReportResponse,
     index: number,
 ) => {
     const dateRangeValue = `date_range_${index}`;
