@@ -1,17 +1,12 @@
 import * as SingleMetric from '../analytics-data/metric.const';
 import { createPlainTextSection, postMessage } from '../slack/slack.service';
-import {
-    TODAY,
-    YESTERDAY,
-    THIS_WEEK,
-    LAST_WEEK,
-} from './report/date-range.const';
-import { DateRanges, getReports } from './report/report.service';
+import { TODAY, YESTERDAY, THIS_WEEK, LAST_WEEK } from './date-range.const';
+import { DateRanges, getReports } from './report.service';
 import {
     CompareMetricOptions,
     compareDimension,
     compareMetric,
-} from './report/response.processor';
+} from './alert.processor';
 
 type AlertOptions = {
     dateRanges: DateRanges;

@@ -1,6 +1,6 @@
-import { runReport } from '../../analytics-data/analytics-data.service';
-import { Metric } from '../../analytics-data/metric.enum';
-import { DimensionFilter } from '../notification.filter';
+import { runReport } from '../analytics-data/analytics-data.service';
+import { Metric } from '../analytics-data/metric.enum';
+import { DimensionFilter } from './notification.filter';
 
 export type DateRanges = { startDate: string; endDate: string }[];
 

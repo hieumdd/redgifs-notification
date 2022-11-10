@@ -6,9 +6,9 @@ import {
     getDataForDateRange,
     getDataForDimension,
     sortDimensionValue,
-} from '../../analytics-data/analytics-data.service';
-import { SingleMetric } from '../../analytics-data/metric.const';
-import { percentageFormatter } from '../notification.service';
+} from '../analytics-data/analytics-data.service';
+import { SingleMetric } from '../analytics-data/metric.const';
+import { percentageFormatter } from './notification.service';
 
 export type CompareMetricOptions = { threshold: number; suffix: string };
 
