@@ -1,8 +1,9 @@
-export const DateRanges = {
-    today: { startDate: 'today', endDate: 'today' },
-    yesterday: { startDate: 'yesterday', endDate: 'yesterday' },
-    thisWeek: { startDate: '7daysAgo', endDate: 'today' },
-    lastWeek: { startDate: '14daysAgo', endDate: '7daysAgo' },
-};
+export const TODAY = { startDate: 'yesterday', endDate: 'yesterday' };
 
-export const dateRanges = Object.values(DateRanges);
+export const YESTERDAY = { startDate: '2daysAgo', endDate: '2daysAgo' };
+
+export const THIS_WEEK = { startDate: '8daysAgo', endDate: 'yesterday' };
+
+export const LAST_WEEK = { startDate: '15daysAgo', endDate: '8daysAgo' };
+
+export const THIS_MONTH = { startDate: '29daysAgo', endDate: 'yesterday' };

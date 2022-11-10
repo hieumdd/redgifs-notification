@@ -1,16 +1,16 @@
 import { runReport } from '../../analytics-data/analytics-data.service';
 import { Metric } from '../../analytics-data/metric.enum';
 import { DimensionFilter } from '../notification.filter';
-import { dateRanges } from './date-range.const';
+
+export type DateRanges = { startDate: string; endDate: string }[];
 
 export const [singleMetric, singleMetricReddit] = (() => {
     return [undefined, DimensionFilter.REDDIT].map((dimensionFilter) => {
-        return async () => {
+        return async (dateRanges: DateRanges) => {
             return runReport({
                 dateRanges,
                 metrics: [
                     Metric.ACTIVE_7_DAY_USERS,
-                    Metric.ACTIVE_28_DAY_USERS,
                     Metric.TOTAL_USERS,
                     Metric.SCREEN_PAGE_VIEWS,
                     Metric.AVERAGE_SESSION_DURATION,
@@ -26,7 +26,7 @@ export const [gifViews, gifViewsReddit] = (() => {
         [DimensionFilter.GIF_VIEW],
         [DimensionFilter.GIF_VIEW, DimensionFilter.REDDIT],
     ].map((expressions) => {
-        return async () => {
+        return async (dateRanges: DateRanges) => {
             return runReport({
                 dateRanges,
                 metrics: [{ name: Metric.EVENT_COUNT }],
@@ -41,7 +41,7 @@ export const [loggedInUsers, loggedInUsersReddit] = (() => {
         [DimensionFilter.LOGGED_IN],
         [DimensionFilter.LOGGED_IN, DimensionFilter.REDDIT],
     ].map((expressions) => {
-        return async () => {
+        return async (dateRanges: DateRanges) => {
             return runReport({
                 dateRanges,
                 metrics: [{ name: Metric.TOTAL_USERS }],
@@ -53,7 +53,7 @@ export const [loggedInUsers, loggedInUsersReddit] = (() => {
 
 export const [topTag, topTagReddit] = (() => {
     return [undefined, DimensionFilter.REDDIT].map((dimensionFilter) => {
-        return async () => {
+        return async (dateRanges: DateRanges) => {
             return runReport({
                 dateRanges,
                 dimensions: [{ name: 'customEvent:tag_name' }],
@@ -64,21 +64,27 @@ export const [topTag, topTagReddit] = (() => {
     });
 })();
 
-export const getReports = async () => {
+export const getReports = async (dateRanges: DateRanges) => {
     const [singleMetricResponse, singleMetricRedditResponse] =
-        await Promise.all([singleMetric(), singleMetricReddit()]);
+        await Promise.all([
+            singleMetric(dateRanges),
+            singleMetricReddit(dateRanges),
+        ]);
 
     const [gifViewsResponse, gifViewsRedditResponse] = await Promise.all([
-        gifViews(),
-        gifViewsReddit(),
+        gifViews(dateRanges),
+        gifViewsReddit(dateRanges),
     ]);
 
     const [loggedInUsersResponse, loggedInUsersRedditResponse] =
-        await Promise.all([loggedInUsers(), loggedInUsersReddit()]);
+        await Promise.all([
+            loggedInUsers(dateRanges),
+            loggedInUsersReddit(dateRanges),
+        ]);
 
     const [topTagResponse, topTagRedditResponse] = await Promise.all([
-        topTag(),
-        topTagReddit(),
+        topTag(dateRanges),
+        topTagReddit(dateRanges),
     ]);
 
     return {
@@ -92,3 +98,5 @@ export const getReports = async () => {
         topTagRedditResponse,
     };
 };
+
+export type Responses = Awaited<ReturnType<typeof getReports>>;

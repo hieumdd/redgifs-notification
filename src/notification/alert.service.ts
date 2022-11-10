@@ -1,59 +1,103 @@
 import * as SingleMetric from '../analytics-data/metric.const';
-import { getReports } from './report/report.service';
-import { compareDimensionDoD, compareMetricDoD } from './response.processor';
+import { createPlainTextSection, postMessage } from '../slack/slack.service';
+import {
+    TODAY,
+    YESTERDAY,
+    THIS_WEEK,
+    LAST_WEEK,
+} from './report/date-range.const';
+import { DateRanges, getReports } from './report/report.service';
+import {
+    CompareMetricOptions,
+    compareDimension,
+    compareMetric,
+} from './report/response.processor';
 
-export const alertDaily = (
-    responses: Awaited<ReturnType<typeof getReports>>,
-) => {
-    const [active7DayUsers, active28DayUsers, totalUsers] = [
-        SingleMetric.active7DayUsers,
-        SingleMetric.active28DayUsers,
-        SingleMetric.totalUsers,
-    ].map((metric) => compareMetricDoD(responses.singleMetricResponse, metric));
-
-    const totalUsersReddit = compareMetricDoD(
-        responses.singleMetricRedditResponse,
-        SingleMetric.totalUsersReddit,
-    );
-
-    const gifViews = compareMetricDoD(
-        responses.gifViewsResponse,
-        SingleMetric.gifViews,
-    );
-
-    const gifViewsReddit = compareMetricDoD(
-        responses.gifViewsRedditResponse,
-        SingleMetric.gifViewsReddit,
-    );
-
-    const loggedInUsers = compareMetricDoD(
-        responses.loggedInUsersResponse,
-        SingleMetric.loggedInUsers,
-    );
-
-    const loggedInUsersReddit = compareMetricDoD(
-        responses.loggedInUsersRedditResponse,
-        SingleMetric.loggedInUsersReddit,
-    );
-
-    const topTag = compareDimensionDoD(responses.topTagResponse, {
-        name: 'Top Tag',
-    });
-
-    const topTagReddit = compareDimensionDoD(responses.topTagResponse, {
-        name: 'Top Tag from Reddit',
-    });
-
-    return [
-        active7DayUsers,
-        active28DayUsers,
-        totalUsers,
-        totalUsersReddit,
-        gifViews,
-        gifViewsReddit,
-        loggedInUsers,
-        loggedInUsersReddit,
-        topTag,
-        topTagReddit,
-    ];
+type AlertOptions = {
+    dateRanges: DateRanges;
+    compareOptions: CompareMetricOptions;
 };
+
+export const [alertDaily, alertWeekly] = (() => {
+    const options: AlertOptions[] = [
+        {
+            dateRanges: [TODAY, YESTERDAY],
+            compareOptions: { threshold: 0.05, suffix: 'yesterday' },
+        },
+        {
+            dateRanges: [THIS_WEEK, LAST_WEEK],
+            compareOptions: { threshold: 1, suffix: 'last week' },
+        },
+    ];
+
+    return options.map(({ dateRanges, compareOptions }) => async () => {
+        const responses = await getReports(dateRanges);
+
+        const [active7DayUsers, totalUsers] = [
+            SingleMetric.active7DayUsers,
+            SingleMetric.totalUsers,
+        ].map((metric) =>
+            compareMetric(
+                responses.singleMetricResponse,
+                metric,
+                compareOptions,
+            ),
+        );
+
+        const totalUsersReddit = compareMetric(
+            responses.singleMetricRedditResponse,
+            SingleMetric.totalUsersReddit,
+            compareOptions,
+        );
+
+        const gifViews = compareMetric(
+            responses.gifViewsResponse,
+            SingleMetric.gifViews,
+            compareOptions,
+        );
+
+        const gifViewsReddit = compareMetric(
+            responses.gifViewsRedditResponse,
+            SingleMetric.gifViewsReddit,
+            compareOptions,
+        );
+
+        const loggedInUsers = compareMetric(
+            responses.loggedInUsersResponse,
+            SingleMetric.loggedInUsers,
+            compareOptions,
+        );
+
+        const loggedInUsersReddit = compareMetric(
+            responses.loggedInUsersRedditResponse,
+            SingleMetric.loggedInUsersReddit,
+            compareOptions,
+        );
+
+        const topTag = compareDimension(
+            responses.topTagResponse,
+            { name: 'Top Tag' },
+            compareOptions,
+        );
+
+        const topTagReddit = compareDimension(
+            responses.topTagResponse,
+            { name: 'Top Tag from Reddit' },
+            compareOptions,
+        );
+
+        const blocks = [
+            active7DayUsers,
+            totalUsers,
+            totalUsersReddit,
+            gifViews,
+            gifViewsReddit,
+            loggedInUsers,
+            loggedInUsersReddit,
+            topTag,
+            topTagReddit,
+        ].map((text) => createPlainTextSection(text));
+
+        return postMessage({ blocks });
+    });
+})();
