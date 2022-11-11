@@ -36,22 +36,11 @@ export const scheduled = async () => {
         ),
     ];
 
-    const [sessionsFigures, sessionsRedditFigures] = [
-        reportMetricValue(
-            responses.singleMetricResponse,
-            SingleMetric.sessions,
-        ),
-        reportMetricValue(
-            responses.singleMetricRedditResponse,
-            SingleMetric.sessions,
-        ),
-    ];
-
     const [gifViewsPerSessions, gifViewsPerSessionsReddit] = [
         reportMetricDivision(
             reportMetricValue(
-                responses.singleMetricResponse,
-                SingleMetric.sessions,
+                responses.gifViewsResponse,
+                SingleMetric.gifViews,
             ),
             reportMetricValue(
                 responses.singleMetricResponse,
@@ -61,8 +50,8 @@ export const scheduled = async () => {
         ),
         reportMetricDivision(
             reportMetricValue(
-                responses.singleMetricRedditResponse,
-                SingleMetric.sessions,
+                responses.gifViewsRedditResponse,
+                SingleMetric.gifViewsReddit,
             ),
             reportMetricValue(
                 responses.singleMetricRedditResponse,

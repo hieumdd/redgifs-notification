@@ -14,7 +14,10 @@ export const runReport = (request: IRunReportRequest) =>
             returnPropertyQuota: true,
             ...request,
         })
-        .then(([response]) => response);
+        .then(([response]) => {
+            console.log('quota', response.propertyQuota);
+            return response;
+        });
 
 export const getDataForDimension = (
     response: IRunReportResponse,
