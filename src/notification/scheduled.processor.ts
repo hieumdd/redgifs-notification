@@ -7,6 +7,7 @@ import {
 } from '../analytics-data/analytics-data.service';
 import { SingleMetric } from '../analytics-data/metric.const';
 import { percentageFormatter } from './notification.service';
+import { Metric } from '../analytics-data/metric.enum';
 
 export const reportMetricValue = (
     response: IRunReportResponse,
@@ -19,11 +20,11 @@ export const reportMetricValue = (
         .map((rows) => rows?.pop())
         .map((row) => row?.metricValues?.pop()?.value as string)
         .map((value) => parseInt(value))
-        .map((value, i) => (i === 2 ? value / 28 : value)) as [
-        number,
-        number,
-        number,
-    ];
+        .map((value, i) =>
+            i === 2 && metricOptions.key !== Metric.AVERAGE_SESSION_DURATION
+                ? value / 28
+                : value,
+        ) as [number, number, number];
 };
 
 const createMetricStatement = (
