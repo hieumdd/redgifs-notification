@@ -21,7 +21,7 @@ export const [alertDaily, alertWeekly] = (() => {
         },
         {
             dateRanges: [THIS_WEEK, LAST_WEEK],
-            compareOptions: { threshold: 1, suffix: 'last week' },
+            compareOptions: { threshold: 0.1, suffix: 'last week' },
         },
     ];
 
@@ -45,41 +45,44 @@ export const [alertDaily, alertWeekly] = (() => {
             compareOptions,
         );
 
-        const gifViews = compareMetric(
-            responses.gifViewsResponse,
-            SingleMetric.gifViews,
-            compareOptions,
-        );
+        const [gifViews, gifViewsReddit] = [
+            compareMetric(
+                responses.gifViewsResponse,
+                SingleMetric.gifViews,
+                compareOptions,
+            ),
+            compareMetric(
+                responses.gifViewsRedditResponse,
+                SingleMetric.gifViewsReddit,
+                compareOptions,
+            ),
+        ];
 
-        const gifViewsReddit = compareMetric(
-            responses.gifViewsRedditResponse,
-            SingleMetric.gifViewsReddit,
-            compareOptions,
-        );
+        const [loggedInUsers, loggedInUsersReddit] = [
+            compareMetric(
+                responses.tagClickedResponse,
+                SingleMetric.loggedInUsers,
+                compareOptions,
+            ),
+            compareMetric(
+                responses.loggedInUsersRedditResponse,
+                SingleMetric.loggedInUsersReddit,
+                compareOptions,
+            ),
+        ];
 
-        const loggedInUsers = compareMetric(
-            responses.tagClickedResponse,
-            SingleMetric.loggedInUsers,
-            compareOptions,
-        );
-
-        const loggedInUsersReddit = compareMetric(
-            responses.loggedInUsersRedditResponse,
-            SingleMetric.loggedInUsersReddit,
-            compareOptions,
-        );
-
-        const topTag = compareDimension(
-            responses.topTagResponse,
-            { name: 'Top Tag' },
-            compareOptions,
-        );
-
-        const topTagReddit = compareDimension(
-            responses.topTagResponse,
-            { name: 'Top Tag from Reddit' },
-            compareOptions,
-        );
+        const [topTag, topTagReddit] = [
+            compareDimension(
+                responses.topTagResponse,
+                { name: 'Top Tag' },
+                compareOptions,
+            ),
+            compareDimension(
+                responses.topTagResponse,
+                { name: 'Top Tag from Reddit' },
+                compareOptions,
+            ),
+        ];
 
         const blocks = [
             active7DayUsers,
