@@ -66,6 +66,7 @@ export const [topTag, topTagReddit] = (() => {
                         metric: { metricName: Metric.EVENT_COUNT },
                     },
                 ],
+                limit: 5,
             });
         };
     });
