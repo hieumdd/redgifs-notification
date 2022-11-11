@@ -58,7 +58,7 @@ export const [alertDaily, alertWeekly] = (() => {
         );
 
         const loggedInUsers = compareMetric(
-            responses.loggedInUsersResponse,
+            responses.tagClickedResponse,
             SingleMetric.loggedInUsers,
             compareOptions,
         );

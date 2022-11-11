@@ -50,6 +50,16 @@ export const gifViewsPerSession: SingleMetric = {
     key: Metric.EVENT_COUNT,
 };
 
+export const tagClicked: SingleMetric = {
+    name: 'Tag Clicked',
+    key: Metric.EVENT_COUNT,
+};
+
+export const tagClickedReddit: SingleMetric = {
+    name: 'Tag Clicked from Reddit',
+    key: Metric.EVENT_COUNT,
+};
+
 export const gifViewsPerSessionReddit: SingleMetric = {
     name: 'GIF Views per Session from Reddit',
     key: Metric.EVENT_COUNT,

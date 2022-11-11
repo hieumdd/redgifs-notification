@@ -52,6 +52,21 @@ export const [loggedInUsers, loggedInUsersReddit] = (() => {
     });
 })();
 
+export const [tagClicked, tagClickedReddit] = (() => {
+    return [
+        [DimensionFilter.TAG_CLICKED],
+        [DimensionFilter.TAG_CLICKED, DimensionFilter.REDDIT],
+    ].map((expressions) => {
+        return async (dateRanges: DateRanges) => {
+            return runReport({
+                dateRanges,
+                metrics: [{ name: Metric.EVENT_COUNT }],
+                dimensionFilter: { andGroup: { expressions } },
+            });
+        };
+    });
+})();
+
 export const [topTag, topTagReddit] = (() => {
     return [undefined, DimensionFilter.REDDIT].map((dimensionFilter) => {
         return async (dateRanges: DateRanges) => {
@@ -90,6 +105,11 @@ export const getReports = async (dateRanges: DateRanges) => {
             loggedInUsersReddit(dateRanges),
         ]);
 
+    const [tagClickedResponse, tagClickedRedditResponse] = await Promise.all([
+        tagClicked(dateRanges),
+        tagClickedReddit(dateRanges),
+    ]);
+
     const [topTagResponse, topTagRedditResponse] = await Promise.all([
         topTag(dateRanges),
         topTagReddit(dateRanges),
@@ -102,6 +122,8 @@ export const getReports = async (dateRanges: DateRanges) => {
         gifViewsRedditResponse,
         loggedInUsersResponse,
         loggedInUsersRedditResponse,
+        tagClickedResponse,
+        tagClickedRedditResponse,
         topTagResponse,
         topTagRedditResponse,
     };

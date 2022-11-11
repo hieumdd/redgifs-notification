@@ -62,13 +62,18 @@ export const scheduled = async () => {
     ];
 
     const [loggedInUsers, loggedInUsersReddit] = [
-        reportMetric(
-            responses.loggedInUsersResponse,
-            SingleMetric.loggedInUsers,
-        ),
+        reportMetric(responses.tagClickedResponse, SingleMetric.loggedInUsers),
         reportMetric(
             responses.loggedInUsersRedditResponse,
             SingleMetric.loggedInUsersReddit,
+        ),
+    ];
+
+    const [tagClicked, tagClickedReddit] = [
+        reportMetric(responses.tagClickedResponse, SingleMetric.tagClicked),
+        reportMetric(
+            responses.tagClickedResponse,
+            SingleMetric.tagClickedReddit,
         ),
     ];
 
@@ -92,7 +97,8 @@ export const scheduled = async () => {
         gifViewsPerSessionsReddit,
         loggedInUsers,
         loggedInUsersReddit,
-
+        tagClicked,
+        tagClickedReddit,
         topTag,
         topTagReddit,
     ].map((text) => createPlainTextSection(text));
