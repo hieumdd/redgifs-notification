@@ -1,22 +1,21 @@
 import { createPlainTextSection, postMessage } from '../slack/slack.service';
-import * as AlertService from './alert/alert.service';
-import * as ScheduledService from './scheduled/scheduled.service';
-import { notificationService } from './notification.service';
+import { alertDaily, alertWeekly } from './alert.service';
+import { scheduled } from './scheduled.service';
 
 describe('Notification Service', () => {
-    const cases: [string, (() => Promise<any>)[]][] = [
-        ['alert-daily', AlertService.daily],
-        ['alert-weekly', AlertService.weekly],
-        ['scheduled', ScheduledService.scheduleds],
+    const cases: [string, () => Promise<boolean>][] = [
+        ['alert-daily', alertDaily],
+        ['alert-weekly', alertWeekly],
+        ['scheduled', scheduled],
     ];
 
     afterEach(async () => {
         await postMessage({ blocks: [createPlainTextSection('=======')] });
     });
 
-    it.each(cases)('Alert %p', async (_, services) => {
-        return notificationService(services).then((response) => {
-            expect(response.ok).toBe(true);
+    it.each(cases)('Run %p', async (_, service) => {
+        return service().then((ok) => {
+            expect(ok).toBe(true);
         });
     });
 });

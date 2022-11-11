@@ -49,4 +49,14 @@ export const DimensionFilter: { [key: string]: IFilterExpression } = {
             },
         },
     },
+    TAG_CLICKED: {
+        filter: {
+            fieldName: 'eventName',
+            stringFilter: {
+                matchType: 'EXACT',
+                value: 'tag_clicked',
+                caseSensitive: false,
+            },
+        },
+    },
 };

@@ -12,8 +12,10 @@ export const createPlainTextSection = (text: string) => ({
 export const postMessage = (
     options: Omit<ChatPostMessageArguments, 'channel'>,
 ) =>
-    client.chat.postMessage({
-        ...options,
-        text: 'redgifs-notification',
-        channel,
-    });
+    client.chat
+        .postMessage({
+            ...options,
+            text: 'redgifs-notification',
+            channel,
+        })
+        .then((response) => response.ok);
