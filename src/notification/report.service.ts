@@ -4,71 +4,66 @@ import { DimensionFilter } from './notification.filter';
 
 export type DateRanges = { startDate: string; endDate: string }[];
 
-export const [singleMetric, singleMetricReddit] = (() => {
-    return [undefined, DimensionFilter.REDDIT].map((dimensionFilter) => {
-        return async (dateRanges: DateRanges) => {
-            return runReport({
-                dateRanges,
-                metrics: [
-                    Metric.ACTIVE_7_DAY_USERS,
-                    Metric.AVERAGE_SESSION_DURATION,
-                    Metric.SCREEN_PAGE_VIEWS,
-                    Metric.SESSIONS,
-                    Metric.TOTAL_USERS,
-                ].map((metric) => ({ name: metric })),
-                dimensionFilter,
-            });
-        };
-    });
-})();
+export const [singleMetric, singleMetricReddit] = [
+    undefined,
+    DimensionFilter.REDDIT,
+].map((dimensionFilter) => {
+    return async (dateRanges: DateRanges) => {
+        return runReport({
+            dateRanges,
+            metrics: [
+                Metric.ACTIVE_7_DAY_USERS,
+                Metric.AVERAGE_SESSION_DURATION,
+                Metric.SCREEN_PAGE_VIEWS,
+                Metric.SESSIONS,
+                Metric.TOTAL_USERS,
+            ].map((metric) => ({ name: metric })),
+            dimensionFilter,
+        });
+    };
+});
 
-export const [gifViews, gifViewsReddit] = (() => {
-    return [
-        [DimensionFilter.GIF_VIEW],
-        [DimensionFilter.GIF_VIEW, DimensionFilter.REDDIT],
-    ].map((expressions) => {
-        return async (dateRanges: DateRanges) => {
-            return runReport({
-                dateRanges,
-                metrics: [{ name: Metric.EVENT_COUNT }],
-                dimensionFilter: { andGroup: { expressions } },
-            });
-        };
-    });
-})();
+export const [gifViews, gifViewsReddit] = [
+    [DimensionFilter.GIF_VIEW],
+    [DimensionFilter.GIF_VIEW, DimensionFilter.REDDIT],
+].map((expressions) => {
+    return async (dateRanges: DateRanges) => {
+        return runReport({
+            dateRanges,
+            metrics: [{ name: Metric.EVENT_COUNT }],
+            dimensionFilter: { andGroup: { expressions } },
+        });
+    };
+});
 
-export const [loggedInUsers, loggedInUsersReddit] = (() => {
-    return [
-        [DimensionFilter.LOGGED_IN],
-        [DimensionFilter.LOGGED_IN, DimensionFilter.REDDIT],
-    ].map((expressions) => {
-        return async (dateRanges: DateRanges) => {
-            return runReport({
-                dateRanges,
-                metrics: [{ name: Metric.TOTAL_USERS }],
-                dimensionFilter: { andGroup: { expressions } },
-            });
-        };
-    });
-})();
+export const [loggedInUsers, loggedInUsersReddit] = [
+    [DimensionFilter.LOGGED_IN],
+    [DimensionFilter.LOGGED_IN, DimensionFilter.REDDIT],
+].map((expressions) => {
+    return async (dateRanges: DateRanges) => {
+        return runReport({
+            dateRanges,
+            metrics: [{ name: Metric.TOTAL_USERS }],
+            dimensionFilter: { andGroup: { expressions } },
+        });
+    };
+});
 
-export const [tagClicked, tagClickedReddit] = (() => {
-    return [
-        [DimensionFilter.TAG_CLICKED],
-        [DimensionFilter.TAG_CLICKED, DimensionFilter.REDDIT],
-    ].map((expressions) => {
-        return async (dateRanges: DateRanges) => {
-            return runReport({
-                dateRanges,
-                metrics: [{ name: Metric.EVENT_COUNT }],
-                dimensionFilter: { andGroup: { expressions } },
-            });
-        };
-    });
-})();
+export const [tagClicked, tagClickedReddit] = [
+    [DimensionFilter.TAG_CLICKED],
+    [DimensionFilter.TAG_CLICKED, DimensionFilter.REDDIT],
+].map((expressions) => {
+    return async (dateRanges: DateRanges) => {
+        return runReport({
+            dateRanges,
+            metrics: [{ name: Metric.EVENT_COUNT }],
+            dimensionFilter: { andGroup: { expressions } },
+        });
+    };
+});
 
-export const [topTag, topTagReddit] = (() => {
-    return [undefined, DimensionFilter.REDDIT].map((dimensionFilter) => {
+export const [topTag, topTagReddit] = [undefined, DimensionFilter.REDDIT].map(
+    (dimensionFilter) => {
         return async (dateRanges: DateRanges) => {
             return runReport({
                 dateRanges,
@@ -84,8 +79,8 @@ export const [topTag, topTagReddit] = (() => {
                 limit: 5,
             });
         };
-    });
-})();
+    },
+);
 
 export const getReports = async (dateRanges: DateRanges) => {
     const [singleMetricResponse, singleMetricRedditResponse] =
