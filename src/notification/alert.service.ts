@@ -1,16 +1,16 @@
-import * as SingleMetric from '../analytics-data/metric.const';
-import { createPlainTextSection, postMessage } from '../slack/slack.service';
+import { MetricKey, MetricName, EventKey } from '../analytics-data/metric.enum';
 import { TODAY, YESTERDAY, THIS_WEEK, LAST_WEEK } from './date-range.const';
 import { DateRanges, getReports } from './report.service';
 import {
-    CompareMetricOptions,
-    compareDimension,
+    getTopDimension,
+    compareEvent,
     compareMetric,
 } from './alert.processor';
+import { createPlainTextSection, postMessage } from '../slack/slack.service';
 
 type AlertOptions = {
     dateRanges: DateRanges;
-    compareOptions: CompareMetricOptions;
+    compareOptions: { threshold: number; suffix: string };
 };
 
 export const [alertDaily, alertWeekly] = (() => {
@@ -29,8 +29,14 @@ export const [alertDaily, alertWeekly] = (() => {
         const responses = await getReports(dateRanges);
 
         const [active7DayUsers, totalUsers] = [
-            SingleMetric.active7DayUsers,
-            SingleMetric.totalUsers,
+            {
+                name: MetricName.ACTIVE_7_DAY_USERS,
+                key: MetricKey.ACTIVE_7_DAY_USERS,
+            },
+            {
+                name: MetricName.TOTAL_USERS,
+                key: MetricKey.TOTAL_USERS,
+            },
         ].map((metric) =>
             compareMetric(
                 responses.singleMetricResponse,
@@ -41,45 +47,60 @@ export const [alertDaily, alertWeekly] = (() => {
 
         const totalUsersReddit = compareMetric(
             responses.singleMetricRedditResponse,
-            SingleMetric.totalUsersReddit,
+            {
+                name: MetricName.TOTAL_USERS_REDDIT,
+                key: MetricKey.TOTAL_USERS,
+            },
             compareOptions,
         );
 
-        const [gifViews, gifViewsReddit] = [
-            compareMetric(
-                responses.gifViewsResponse,
-                SingleMetric.gifViews,
-                compareOptions,
-            ),
-            compareMetric(
-                responses.gifViewsRedditResponse,
-                SingleMetric.gifViewsReddit,
-                compareOptions,
-            ),
-        ];
-
         const [loggedInUsers, loggedInUsersReddit] = [
             compareMetric(
-                responses.tagClickedResponse,
-                SingleMetric.loggedInUsers,
+                responses.loggedInUsersResponse,
+                {
+                    name: MetricName.LOGGED_IN_USERS,
+                    key: MetricKey.TOTAL_USERS,
+                },
                 compareOptions,
             ),
             compareMetric(
                 responses.loggedInUsersRedditResponse,
-                SingleMetric.loggedInUsersReddit,
+                {
+                    name: MetricName.LOGGED_IN_USERS_REDDIT,
+                    key: MetricKey.TOTAL_USERS,
+                },
+                compareOptions,
+            ),
+        ];
+
+        const [gifViews, gifViewsReddit] = [
+            compareEvent(
+                responses.eventResponse,
+                {
+                    name: MetricName.GIF_VIEWS,
+                    key: EventKey.GIF_VIEW,
+                },
+                compareOptions,
+            ),
+            compareEvent(
+                responses.eventRedditResponse,
+                {
+                    name: MetricName.GIF_VIEWS_REDDIT,
+                    key: EventKey.GIF_VIEW,
+                },
                 compareOptions,
             ),
         ];
 
         const [topTag, topTagReddit] = [
-            compareDimension(
+            getTopDimension(
                 responses.topTagResponse,
-                { name: 'Top Tag' },
+                { name: MetricName.TOP_TAGS },
                 compareOptions,
             ),
-            compareDimension(
+            getTopDimension(
                 responses.topTagResponse,
-                { name: 'Top Tag from Reddit' },
+                { name: MetricName.TOP_TAGS_REDDIT },
                 compareOptions,
             ),
         ];
@@ -88,10 +109,10 @@ export const [alertDaily, alertWeekly] = (() => {
             active7DayUsers,
             totalUsers,
             totalUsersReddit,
-            gifViews,
-            gifViewsReddit,
             loggedInUsers,
             loggedInUsersReddit,
+            gifViews,
+            gifViewsReddit,
             topTag,
             topTagReddit,
         ].map((text) => createPlainTextSection(text));

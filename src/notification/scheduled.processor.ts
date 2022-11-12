@@ -1,19 +1,21 @@
+import { cloneDeep } from 'lodash';
 import { protos } from '@google-analytics/data';
 import IRunReportResponse = protos.google.analytics.data.v1beta.IRunReportResponse;
 
 import {
     getDataForDateRange,
     getDataForDimension,
+    getDataForMetric,
 } from '../analytics-data/analytics-data.service';
-import { SingleMetric } from '../analytics-data/metric.const';
 import { percentageFormatter } from './notification.service';
-import { Metric } from '../analytics-data/metric.enum';
+import { MetricKey } from '../analytics-data/metric.enum';
+import { MetricOptions } from './notification.interface';
 
 export const reportMetricValue = (
     response: IRunReportResponse,
-    metricOptions: SingleMetric,
+    metricOptions: MetricOptions,
 ) => {
-    const data = getDataForDimension(response, metricOptions.key);
+    const data = cloneDeep(getDataForMetric(response, metricOptions.key));
 
     return [0, 1, 2]
         .map((index) => getDataForDateRange(data, index))
@@ -21,7 +23,7 @@ export const reportMetricValue = (
         .map((row) => row?.metricValues?.pop()?.value as string)
         .map((value) => parseInt(value))
         .map((value, i) =>
-            i === 2 && metricOptions.key !== Metric.AVERAGE_SESSION_DURATION
+            i === 2 && metricOptions.key !== MetricKey.AVERAGE_SESSION_DURATION
                 ? value / 28
                 : value,
         ) as [number, number, number];
@@ -29,7 +31,7 @@ export const reportMetricValue = (
 
 const createMetricStatement = (
     figures: [number, number, number],
-    metricOptions: SingleMetric,
+    metricOptions: MetricOptions,
 ) => {
     const [today, yesterday, thisMonth] = figures;
 
@@ -42,7 +44,7 @@ const createMetricStatement = (
 
 export const reportMetric = (
     response: IRunReportResponse,
-    metricOptions: SingleMetric,
+    metricOptions: MetricOptions,
 ) => {
     const figures = reportMetricValue(response, metricOptions);
 
@@ -52,7 +54,7 @@ export const reportMetric = (
 export const reportMetricDivision = (
     numerators: [number, number, number],
     denominators: [number, number, number],
-    metricOptions: SingleMetric,
+    metricOptions: MetricOptions,
 ) => {
     const [today0, yesterday0, thisMonth0] = numerators;
     const [today1, yesterday1, thisMonth1] = denominators;
@@ -66,9 +68,31 @@ export const reportMetricDivision = (
     return createMetricStatement(figures, metricOptions);
 };
 
+export const reportEventValue = (
+    response: IRunReportResponse,
+    eventOptions: MetricOptions,
+) => {
+    const data = cloneDeep(getDataForDimension(response, eventOptions.key));
+
+    return [0, 1, 2]
+        .map((index) => getDataForDateRange(data, index))
+        .map((rows) => rows?.pop())
+        .map((row) => row?.metricValues?.pop()?.value as string)
+        .map((value) => parseInt(value)) as [number, number, number];
+};
+
+export const reportEvent = (
+    response: IRunReportResponse,
+    eventOptions: MetricOptions,
+) => {
+    const figures = reportEventValue(response, eventOptions);
+
+    return createMetricStatement(figures, eventOptions);
+};
+
 export const reportDimension = (
     response: IRunReportResponse,
-    { name }: { name: string },
+    { name }: Pick<MetricOptions, 'name'>,
 ) => {
     const rows = getDataForDateRange(response, 0);
 

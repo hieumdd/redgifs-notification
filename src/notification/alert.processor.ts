@@ -5,24 +5,23 @@ import IRunReportResponse = protos.google.analytics.data.v1beta.IRunReportRespon
 import {
     getDataForDateRange,
     getDataForDimension,
+    getDataForMetric,
     sortDimensionValue,
 } from '../analytics-data/analytics-data.service';
-import { SingleMetric } from '../analytics-data/metric.const';
 import { percentageFormatter } from './notification.service';
-
-export type CompareMetricOptions = { threshold: number; suffix: string };
+import { MetricOptions } from './notification.interface';
 
 export const compareMetric = (
     response: IRunReportResponse,
-    metricOptions: SingleMetric,
-    compareOptions: CompareMetricOptions,
+    metricOptions: MetricOptions,
+    compareOptions: { threshold: number; suffix: string },
 ) => {
-    const data = getDataForDimension(response, metricOptions.key);
+    const data = getDataForMetric(response, metricOptions.key);
 
     const [dateRange0, dateRange1] = [0, 1]
         .map((index) => getDataForDateRange(data, index))
-        .map((rows) => rows?.pop())
-        .map((row) => row?.metricValues?.pop()?.value as string)
+        .map((rows) => (rows || [])[0])
+        .map((row) => (row?.metricValues || [])[0].value as string)
         .map((value) => parseInt(value));
 
     const figure = (dateRange0 - dateRange1) / dateRange1;
@@ -33,19 +32,36 @@ export const compareMetric = (
     return `${metricOptions.name} has gone down by ${prettyFigure} from ${compareOptions.suffix}`;
 };
 
-export type CompareDimensionOptions = {
-    suffix: string;
+export const compareEvent = (
+    response: IRunReportResponse,
+    eventOptions: MetricOptions,
+    compareOptions: { threshold: number; suffix: string },
+) => {
+    const data = getDataForDimension(response, eventOptions.key);
+
+    const [dateRange0, dateRange1] = [0, 1]
+        .map((index) => getDataForDateRange(data, index))
+        .map((rows) => (rows || [])[0])
+        .map((row) => (row?.metricValues || [])[0].value as string)
+        .map((value) => parseInt(value));
+
+    const figure = (dateRange0 - dateRange1) / dateRange1;
+
+    // if (figure > -compareOptions.threshold) return;
+
+    const prettyFigure = percentageFormatter.format(figure);
+    return `${eventOptions.name} has gone down by ${prettyFigure} from ${compareOptions.suffix}`;
 };
 
-export const compareDimension = (
+export const getTopDimension = (
     response: IRunReportResponse,
-    metricOptions: { name: string },
-    compareOptions: CompareDimensionOptions,
+    metricOptions: Pick<MetricOptions, 'name'>,
+    compareOptions: { suffix: string },
 ) => {
     const [dateRange0, dateRange1] = [0, 1]
         .map((index) => getDataForDateRange(response, index))
         .map((rows) => chain(rows).sortBy(sortDimensionValue).reverse().value())
-        .map((rows) => rows.slice(0, 3))
+        .map((rows) => rows.slice(1, 4))
         .map((rows) =>
             rows.map((row) => (row.dimensionValues || [])[0]?.value),
         );

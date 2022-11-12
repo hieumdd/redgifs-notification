@@ -15,16 +15,19 @@ export const runReport = (request: IRunReportRequest) =>
             ...request,
         })
         .then(([response]) => {
-            console.log('quota', response.propertyQuota);
+            console.log(
+                'quota',
+                response.propertyQuota?.tokensPerProjectPerHour,
+            );
             return response;
         });
 
-export const getDataForDimension = (
+export const getDataForMetric = (
     response: IRunReportResponse,
-    dimension: string,
+    metric: string,
 ) => {
     const index = response.metricHeaders?.findIndex(
-        (header) => header.name === dimension,
+        (header) => header.name === metric,
     ) as number;
 
     const rows = response.rows?.map((row) => {
@@ -46,6 +49,19 @@ export const getDataForDateRange = (
             (dimensionValue) => dimensionValue.value === dateRangeValue,
         ),
     );
+};
+
+export const getDataForDimension = (
+    response: IRunReportResponse,
+    dimension: string,
+) => {
+    const rows = response.rows?.filter((row) => {
+        const x = row.dimensionValues?.map((value) => value.value);
+        return row.dimensionValues
+            ?.map((value) => value.value)
+            .includes(dimension);
+    });
+    return { ...response, rows };
 };
 
 export const sortDimensionValue = ({ metricValues }: IRow) => {
