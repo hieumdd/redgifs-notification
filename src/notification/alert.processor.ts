@@ -33,7 +33,7 @@ export const [compareEvent, compareMetric] = [
         // if (figure > -compareOptions.threshold) return;
 
         const prettyFigure = percentageFormatter.format(figure);
-        return `${metricOptions.name} has gone down by ${prettyFigure} from ${compareOptions.suffix}`;
+        return `${metricOptions.name} has changed by ${prettyFigure} from ${compareOptions.suffix}`;
     };
 });
 

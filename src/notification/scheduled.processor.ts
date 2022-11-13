@@ -6,7 +6,7 @@ import {
     getDataForDimension,
     getDataForMetric,
 } from '../analytics-data/analytics-data.service';
-import { percentageFormatter } from './notification.service';
+import { numberFormatter, percentageFormatter } from './notification.service';
 import { MetricKey } from '../analytics-data/metric.enum';
 import { MetricOptions } from './notification.interface';
 
@@ -43,7 +43,9 @@ const createMetricStatement = (
         .map((figure) => (today - figure) / figure)
         .map((figure) => percentageFormatter.format(figure));
 
-    return `${metricOptions.name} is ${today}, up ${todayOverYesterday} from yesterday and ${todayOverLastWeek} last week`;
+    const prettyToday = numberFormatter.format(today);
+
+    return `${metricOptions.name} is ${prettyToday}, ${todayOverYesterday} from yesterday and ${todayOverLastWeek} last week`;
 };
 
 export const [reportEvent, reportMetric] = [
@@ -86,7 +88,10 @@ export const reportTopDimension = (
             [...(row.dimensionValues || [])].pop()?.value,
             [...(row.metricValues || [])].pop()?.value,
         ])
-        .map(([key, value]) => `${key} (${value})`)
+        .map(
+            ([key, value]) =>
+                `${key} (${numberFormatter.format(parseFloat(value || '0'))})`,
+        )
         .join(', ');
 
     return `${name} are ${dimensions}`;
