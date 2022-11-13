@@ -4,32 +4,38 @@ import IRunReportResponse = protos.google.analytics.data.v1beta.IRunReportRespon
 import {
     getDataForDateRange,
     getDataForDimension,
+    getDataForMetric,
 } from '../analytics-data/analytics-data.service';
-import { SingleMetric } from '../analytics-data/metric.const';
-import { percentageFormatter } from './notification.service';
-import { Metric } from '../analytics-data/metric.enum';
+import { numberFormatter, percentageFormatter } from './notification.service';
+import { MetricKey } from '../analytics-data/metric.enum';
+import { MetricOptions } from './notification.interface';
 
-export const reportMetricValue = (
-    response: IRunReportResponse,
-    metricOptions: SingleMetric,
-) => {
-    const data = getDataForDimension(response, metricOptions.key);
+type SingleMetricValue = [number, number, number];
 
-    return [0, 1, 2]
-        .map((index) => getDataForDateRange(data, index))
-        .map((rows) => rows?.pop())
-        .map((row) => row?.metricValues?.pop()?.value as string)
-        .map((value) => parseInt(value))
-        .map((value, i) =>
-            i === 2 && metricOptions.key !== Metric.AVERAGE_SESSION_DURATION
-                ? value / 28
-                : value,
-        ) as [number, number, number];
-};
+export const [reportEventValue, reportMetricValue] = [
+    getDataForDimension,
+    getDataForMetric,
+].map((parse) => {
+    return (response: IRunReportResponse, metricOptions: MetricOptions) => {
+        const data = parse(response, metricOptions.key);
+
+        return [0, 1, 2]
+            .map((index) => getDataForDateRange(data, index))
+            .map((rows) => [...(rows || [])].pop())
+            .map((row) => [...(row?.metricValues || [])].pop()?.value as string)
+            .map((value) => parseInt(value))
+            .map((value, i) =>
+                i === 2 &&
+                metricOptions.key !== MetricKey.AVERAGE_SESSION_DURATION
+                    ? value / 28
+                    : value,
+            ) as SingleMetricValue;
+    };
+});
 
 const createMetricStatement = (
-    figures: [number, number, number],
-    metricOptions: SingleMetric,
+    figures: SingleMetricValue,
+    metricOptions: MetricOptions,
 ) => {
     const [today, yesterday, thisMonth] = figures;
 
@@ -37,22 +43,26 @@ const createMetricStatement = (
         .map((figure) => (today - figure) / figure)
         .map((figure) => percentageFormatter.format(figure));
 
-    return `${metricOptions.name} is ${today}, up ${todayOverYesterday} from yesterday and ${todayOverLastWeek} last week`;
+    const prettyToday = numberFormatter.format(today);
+
+    return `${metricOptions.name} is ${prettyToday}, ${todayOverYesterday} from yesterday and ${todayOverLastWeek} last week`;
 };
 
-export const reportMetric = (
-    response: IRunReportResponse,
-    metricOptions: SingleMetric,
-) => {
-    const figures = reportMetricValue(response, metricOptions);
+export const [reportEvent, reportMetric] = [
+    reportEventValue,
+    reportMetricValue,
+].map((report) => {
+    return (response: IRunReportResponse, metricOptions: MetricOptions) => {
+        const figures = report(response, metricOptions);
 
-    return createMetricStatement(figures, metricOptions);
-};
+        return createMetricStatement(figures, metricOptions);
+    };
+});
 
-export const reportMetricDivision = (
-    numerators: [number, number, number],
-    denominators: [number, number, number],
-    metricOptions: SingleMetric,
+export const reportDivision = (
+    numerators: SingleMetricValue,
+    denominators: SingleMetricValue,
+    metricOptions: MetricOptions,
 ) => {
     const [today0, yesterday0, thisMonth0] = numerators;
     const [today1, yesterday1, thisMonth1] = denominators;
@@ -61,24 +71,27 @@ export const reportMetricDivision = (
         today0 / today1,
         yesterday0 / yesterday1,
         thisMonth0 / thisMonth1,
-    ] as [number, number, number];
+    ] as SingleMetricValue;
 
     return createMetricStatement(figures, metricOptions);
 };
 
-export const reportDimension = (
+export const reportTopDimension = (
     response: IRunReportResponse,
-    { name }: { name: string },
+    { name }: Pick<MetricOptions, 'name'>,
 ) => {
     const rows = getDataForDateRange(response, 0);
 
     const dimensions = (rows || [])
         .slice(1, 4)
         .map((row) => [
-            (row.dimensionValues || [])[0]?.value,
-            (row.metricValues || [])[0].value,
+            [...(row.dimensionValues || [])].pop()?.value,
+            [...(row.metricValues || [])].pop()?.value,
         ])
-        .map(([key, value]) => `${key} (${value})`)
+        .map(
+            ([key, value]) =>
+                `${key} (${numberFormatter.format(parseFloat(value || '0'))})`,
+        )
         .join(', ');
 
     return `${name} are ${dimensions}`;

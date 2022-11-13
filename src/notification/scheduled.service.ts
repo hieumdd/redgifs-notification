@@ -1,13 +1,15 @@
-import * as SingleMetric from '../analytics-data/metric.const';
-import { createPlainTextSection, postMessage } from '../slack/slack.service';
+import { MetricKey, MetricName, EventKey } from '../analytics-data/metric.enum';
 import { TODAY, YESTERDAY, THIS_MONTH } from './date-range.const';
 import { getReports } from './report.service';
 import {
-    reportDimension,
+    reportTopDimension,
     reportMetric,
     reportMetricValue,
-    reportMetricDivision,
+    reportDivision,
+    reportEvent,
+    reportEventValue,
 } from './scheduled.processor';
+import { createPlainTextSection, postMessage } from '../slack/slack.service';
 
 export const scheduled = async () => {
     const dateRanges = [TODAY, YESTERDAY, THIS_MONTH];
@@ -15,72 +17,107 @@ export const scheduled = async () => {
     const responses = await getReports(dateRanges);
 
     const [totalUsers, pageViews, sessionDuration] = [
-        SingleMetric.totalUsers,
-        SingleMetric.pageViews,
-        SingleMetric.sessionDuration,
+        {
+            name: MetricName.TOTAL_USERS,
+            key: MetricKey.TOTAL_USERS,
+        },
+        {
+            name: MetricName.PAGE_VIEWS,
+            key: MetricKey.SCREEN_PAGE_VIEWS,
+        },
+        {
+            name: MetricName.SESSION_DURATION,
+            key: MetricKey.AVERAGE_SESSION_DURATION,
+        },
     ].map((metric) => reportMetric(responses.singleMetricResponse, metric));
 
     const [totalUsersReddit, pageViewsReddit, sessionDurationReddit] = [
-        SingleMetric.totalUsersReddit,
-        SingleMetric.pageViewsReddit,
-        SingleMetric.sessionDurationReddit,
+        {
+            name: MetricName.TOTAL_USERS_REDDIT,
+            key: MetricKey.TOTAL_USERS,
+        },
+        {
+            name: MetricName.PAGE_VIEWS_REDDIT,
+            key: MetricKey.SCREEN_PAGE_VIEWS,
+        },
+        {
+            name: MetricName.SESSION_DURATION_REDDIT,
+            key: MetricKey.AVERAGE_SESSION_DURATION,
+        },
     ].map((metric) =>
         reportMetric(responses.singleMetricRedditResponse, metric),
     );
 
+    const [loggedInUsers, loggedInUsersReddit] = [
+        reportMetric(responses.loggedInUsersResponse, {
+            name: MetricName.LOGGED_IN_USERS,
+            key: MetricKey.TOTAL_USERS,
+        }),
+        reportMetric(responses.loggedInUsersRedditResponse, {
+            name: MetricName.LOGGED_IN_USERS_REDDIT,
+            key: MetricKey.TOTAL_USERS,
+        }),
+    ];
+
     const [gifViews, gifViewsReddit] = [
-        reportMetric(responses.gifViewsResponse, SingleMetric.gifViews),
-        reportMetric(
-            responses.gifViewsRedditResponse,
-            SingleMetric.gifViewsReddit,
-        ),
+        reportEvent(responses.eventResponse, {
+            name: MetricName.GIF_VIEWS,
+            key: EventKey.GIF_VIEW,
+        }),
+        reportEvent(responses.eventRedditResponse, {
+            name: MetricName.GIF_VIEWS_REDDIT,
+            key: EventKey.GIF_VIEW,
+        }),
     ];
 
     const [gifViewsPerSessions, gifViewsPerSessionsReddit] = [
-        reportMetricDivision(
-            reportMetricValue(
-                responses.gifViewsResponse,
-                SingleMetric.gifViews,
-            ),
-            reportMetricValue(
-                responses.singleMetricResponse,
-                SingleMetric.sessions,
-            ),
-            SingleMetric.gifViewsPerSession,
+        reportDivision(
+            reportEventValue(responses.eventResponse, {
+                name: MetricName.GIF_VIEWS,
+                key: EventKey.GIF_VIEW,
+            }),
+            reportMetricValue(responses.singleMetricResponse, {
+                name: MetricName.SESSIONS,
+                key: MetricKey.SESSIONS,
+            }),
+            {
+                name: MetricName.GIF_VIEWS_PER_SESSION,
+                key: EventKey.GIF_VIEW,
+            },
         ),
-        reportMetricDivision(
-            reportMetricValue(
-                responses.gifViewsRedditResponse,
-                SingleMetric.gifViewsReddit,
-            ),
-            reportMetricValue(
-                responses.singleMetricRedditResponse,
-                SingleMetric.sessions,
-            ),
-            SingleMetric.gifViewsPerSessionReddit,
-        ),
-    ];
-
-    const [loggedInUsers, loggedInUsersReddit] = [
-        reportMetric(responses.tagClickedResponse, SingleMetric.loggedInUsers),
-        reportMetric(
-            responses.loggedInUsersRedditResponse,
-            SingleMetric.loggedInUsersReddit,
+        reportDivision(
+            reportEventValue(responses.eventRedditResponse, {
+                name: MetricName.GIF_VIEWS,
+                key: EventKey.GIF_VIEW,
+            }),
+            reportMetricValue(responses.singleMetricRedditResponse, {
+                name: MetricName.SESSIONS,
+                key: MetricKey.SESSIONS,
+            }),
+            {
+                name: MetricName.GIF_VIEWS_PER_SESSION_REDDIT,
+                key: EventKey.GIF_VIEW,
+            },
         ),
     ];
 
-    const [tagClicked, tagClickedReddit] = [
-        reportMetric(responses.tagClickedResponse, SingleMetric.tagClicked),
-        reportMetric(
-            responses.tagClickedResponse,
-            SingleMetric.tagClickedReddit,
-        ),
+    const [tagClickeds, tagClickedsReddit] = [
+        reportEvent(responses.eventResponse, {
+            name: MetricName.TAG_CLICKEDS,
+            key: EventKey.TAG_CLICKED,
+        }),
+        reportEvent(responses.eventRedditResponse, {
+            name: MetricName.TAG_CLICKEDS_REDDIT,
+            key: EventKey.TAG_CLICKED,
+        }),
     ];
 
     const [topTag, topTagReddit] = [
-        reportDimension(responses.topTagResponse, { name: 'Top Tags' }),
-        reportDimension(responses.topTagRedditResponse, {
-            name: 'Top Tags from Reddit',
+        reportTopDimension(responses.topTagResponse, {
+            name: MetricName.TOP_TAGS,
+        }),
+        reportTopDimension(responses.topTagRedditResponse, {
+            name: MetricName.TOP_TAGS_REDDIT,
         }),
     ];
 
@@ -91,14 +128,14 @@ export const scheduled = async () => {
         pageViewsReddit,
         sessionDuration,
         sessionDurationReddit,
+        loggedInUsers,
+        loggedInUsersReddit,
         gifViews,
         gifViewsReddit,
         gifViewsPerSessions,
         gifViewsPerSessionsReddit,
-        loggedInUsers,
-        loggedInUsersReddit,
-        tagClicked,
-        tagClickedReddit,
+        tagClickeds,
+        tagClickedsReddit,
         topTag,
         topTagReddit,
     ].map((text) => createPlainTextSection(text));
