@@ -2,10 +2,10 @@ import { MetricKey, MetricName, EventKey } from '../analytics-data/metric.enum';
 import { TODAY, YESTERDAY, THIS_MONTH } from './date-range.const';
 import { getReports } from './report.service';
 import {
-    reportDimension,
+    reportTopDimension,
     reportMetric,
     reportMetricValue,
-    reportMetricDivision,
+    reportDivision,
     reportEvent,
     reportEventValue,
 } from './scheduled.processor';
@@ -71,7 +71,7 @@ export const scheduled = async () => {
     ];
 
     const [gifViewsPerSessions, gifViewsPerSessionsReddit] = [
-        reportMetricDivision(
+        reportDivision(
             reportEventValue(responses.eventResponse, {
                 name: MetricName.GIF_VIEWS,
                 key: EventKey.GIF_VIEW,
@@ -85,7 +85,7 @@ export const scheduled = async () => {
                 key: EventKey.GIF_VIEW,
             },
         ),
-        reportMetricDivision(
+        reportDivision(
             reportEventValue(responses.eventRedditResponse, {
                 name: MetricName.GIF_VIEWS,
                 key: EventKey.GIF_VIEW,
@@ -113,10 +113,10 @@ export const scheduled = async () => {
     ];
 
     const [topTag, topTagReddit] = [
-        reportDimension(responses.topTagResponse, {
+        reportTopDimension(responses.topTagResponse, {
             name: MetricName.TOP_TAGS,
         }),
-        reportDimension(responses.topTagRedditResponse, {
+        reportTopDimension(responses.topTagRedditResponse, {
             name: MetricName.TOP_TAGS_REDDIT,
         }),
     ];

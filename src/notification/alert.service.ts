@@ -99,7 +99,7 @@ export const [alertDaily, alertWeekly] = (() => {
                 compareOptions,
             ),
             getTopDimension(
-                responses.topTagResponse,
+                responses.topTagRedditResponse,
                 { name: MetricName.TOP_TAGS_REDDIT },
                 compareOptions,
             ),

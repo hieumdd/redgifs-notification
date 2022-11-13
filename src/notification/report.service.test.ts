@@ -1,6 +1,6 @@
 import * as SingleMetric from '../analytics-data/metric.const';
 import { TODAY, YESTERDAY, THIS_MONTH } from './date-range.const';
-import { event, eventReddit, tagClicked, topTag } from './report.service';
+import { event, eventReddit, topTag } from './report.service';
 import { compareEvent } from './alert.processor';
 
 describe('Report Service', () => {
@@ -18,12 +18,6 @@ describe('Report Service', () => {
     it('Event Reddit', async () => {
         return eventReddit([TODAY, YESTERDAY, THIS_MONTH]).then((res) => {
             expect(res.rowCount).toBeGreaterThanOrEqual(0);
-        });
-    });
-
-    it('Tag Clicked', async () => {
-        return tagClicked([TODAY, YESTERDAY, THIS_MONTH]).then((ok) => {
-            expect(ok).toBe(true);
         });
     });
 

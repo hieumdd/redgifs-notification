@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import { protos } from '@google-analytics/data';
 import IRunReportResponse = protos.google.analytics.data.v1beta.IRunReportResponse;
 
@@ -11,26 +10,31 @@ import { percentageFormatter } from './notification.service';
 import { MetricKey } from '../analytics-data/metric.enum';
 import { MetricOptions } from './notification.interface';
 
-export const reportMetricValue = (
-    response: IRunReportResponse,
-    metricOptions: MetricOptions,
-) => {
-    const data = cloneDeep(getDataForMetric(response, metricOptions.key));
+type SingleMetricValue = [number, number, number];
 
-    return [0, 1, 2]
-        .map((index) => getDataForDateRange(data, index))
-        .map((rows) => rows?.pop())
-        .map((row) => row?.metricValues?.pop()?.value as string)
-        .map((value) => parseInt(value))
-        .map((value, i) =>
-            i === 2 && metricOptions.key !== MetricKey.AVERAGE_SESSION_DURATION
-                ? value / 28
-                : value,
-        ) as [number, number, number];
-};
+export const [reportEventValue, reportMetricValue] = [
+    getDataForDimension,
+    getDataForMetric,
+].map((parse) => {
+    return (response: IRunReportResponse, metricOptions: MetricOptions) => {
+        const data = parse(response, metricOptions.key);
+
+        return [0, 1, 2]
+            .map((index) => getDataForDateRange(data, index))
+            .map((rows) => [...(rows || [])].pop())
+            .map((row) => [...(row?.metricValues || [])].pop()?.value as string)
+            .map((value) => parseInt(value))
+            .map((value, i) =>
+                i === 2 &&
+                metricOptions.key !== MetricKey.AVERAGE_SESSION_DURATION
+                    ? value / 28
+                    : value,
+            ) as SingleMetricValue;
+    };
+});
 
 const createMetricStatement = (
-    figures: [number, number, number],
+    figures: SingleMetricValue,
     metricOptions: MetricOptions,
 ) => {
     const [today, yesterday, thisMonth] = figures;
@@ -42,18 +46,20 @@ const createMetricStatement = (
     return `${metricOptions.name} is ${today}, up ${todayOverYesterday} from yesterday and ${todayOverLastWeek} last week`;
 };
 
-export const reportMetric = (
-    response: IRunReportResponse,
-    metricOptions: MetricOptions,
-) => {
-    const figures = reportMetricValue(response, metricOptions);
+export const [reportEvent, reportMetric] = [
+    reportEventValue,
+    reportMetricValue,
+].map((report) => {
+    return (response: IRunReportResponse, metricOptions: MetricOptions) => {
+        const figures = report(response, metricOptions);
 
-    return createMetricStatement(figures, metricOptions);
-};
+        return createMetricStatement(figures, metricOptions);
+    };
+});
 
-export const reportMetricDivision = (
-    numerators: [number, number, number],
-    denominators: [number, number, number],
+export const reportDivision = (
+    numerators: SingleMetricValue,
+    denominators: SingleMetricValue,
     metricOptions: MetricOptions,
 ) => {
     const [today0, yesterday0, thisMonth0] = numerators;
@@ -63,34 +69,12 @@ export const reportMetricDivision = (
         today0 / today1,
         yesterday0 / yesterday1,
         thisMonth0 / thisMonth1,
-    ] as [number, number, number];
+    ] as SingleMetricValue;
 
     return createMetricStatement(figures, metricOptions);
 };
 
-export const reportEventValue = (
-    response: IRunReportResponse,
-    eventOptions: MetricOptions,
-) => {
-    const data = cloneDeep(getDataForDimension(response, eventOptions.key));
-
-    return [0, 1, 2]
-        .map((index) => getDataForDateRange(data, index))
-        .map((rows) => rows?.pop())
-        .map((row) => row?.metricValues?.pop()?.value as string)
-        .map((value) => parseInt(value)) as [number, number, number];
-};
-
-export const reportEvent = (
-    response: IRunReportResponse,
-    eventOptions: MetricOptions,
-) => {
-    const figures = reportEventValue(response, eventOptions);
-
-    return createMetricStatement(figures, eventOptions);
-};
-
-export const reportDimension = (
+export const reportTopDimension = (
     response: IRunReportResponse,
     { name }: Pick<MetricOptions, 'name'>,
 ) => {
@@ -99,8 +83,8 @@ export const reportDimension = (
     const dimensions = (rows || [])
         .slice(1, 4)
         .map((row) => [
-            (row.dimensionValues || [])[0]?.value,
-            (row.metricValues || [])[0].value,
+            [...(row.dimensionValues || [])].pop()?.value,
+            [...(row.metricValues || [])].pop()?.value,
         ])
         .map(([key, value]) => `${key} (${value})`)
         .join(', ');

@@ -11,47 +11,31 @@ import {
 import { percentageFormatter } from './notification.service';
 import { MetricOptions } from './notification.interface';
 
-export const compareMetric = (
-    response: IRunReportResponse,
-    metricOptions: MetricOptions,
-    compareOptions: { threshold: number; suffix: string },
-) => {
-    const data = getDataForMetric(response, metricOptions.key);
+export const [compareEvent, compareMetric] = [
+    getDataForDimension,
+    getDataForMetric,
+].map((parse) => {
+    return (
+        response: IRunReportResponse,
+        metricOptions: MetricOptions,
+        compareOptions: { threshold: number; suffix: string },
+    ) => {
+        const data = parse(response, metricOptions.key);
 
-    const [dateRange0, dateRange1] = [0, 1]
-        .map((index) => getDataForDateRange(data, index))
-        .map((rows) => (rows || [])[0])
-        .map((row) => (row?.metricValues || [])[0].value as string)
-        .map((value) => parseInt(value));
+        const [dateRange0, dateRange1] = [0, 1]
+            .map((index) => getDataForDateRange(data, index))
+            .map((rows) => [...(rows || [])].pop())
+            .map((row) => [...(row?.metricValues || [])].pop()?.value as string)
+            .map((value) => parseInt(value));
 
-    const figure = (dateRange0 - dateRange1) / dateRange1;
+        const figure = (dateRange0 - dateRange1) / dateRange1;
 
-    // if (figure > -compareOptions.threshold) return;
+        // if (figure > -compareOptions.threshold) return;
 
-    const prettyFigure = percentageFormatter.format(figure);
-    return `${metricOptions.name} has gone down by ${prettyFigure} from ${compareOptions.suffix}`;
-};
-
-export const compareEvent = (
-    response: IRunReportResponse,
-    eventOptions: MetricOptions,
-    compareOptions: { threshold: number; suffix: string },
-) => {
-    const data = getDataForDimension(response, eventOptions.key);
-
-    const [dateRange0, dateRange1] = [0, 1]
-        .map((index) => getDataForDateRange(data, index))
-        .map((rows) => (rows || [])[0])
-        .map((row) => (row?.metricValues || [])[0].value as string)
-        .map((value) => parseInt(value));
-
-    const figure = (dateRange0 - dateRange1) / dateRange1;
-
-    // if (figure > -compareOptions.threshold) return;
-
-    const prettyFigure = percentageFormatter.format(figure);
-    return `${eventOptions.name} has gone down by ${prettyFigure} from ${compareOptions.suffix}`;
-};
+        const prettyFigure = percentageFormatter.format(figure);
+        return `${metricOptions.name} has gone down by ${prettyFigure} from ${compareOptions.suffix}`;
+    };
+});
 
 export const getTopDimension = (
     response: IRunReportResponse,
@@ -63,7 +47,7 @@ export const getTopDimension = (
         .map((rows) => chain(rows).sortBy(sortDimensionValue).reverse().value())
         .map((rows) => rows.slice(1, 4))
         .map((rows) =>
-            rows.map((row) => (row.dimensionValues || [])[0]?.value),
+            rows.map((row) => [...(row.dimensionValues || [])].pop()?.value),
         );
 
     // if (isEqual(dateRange0, dateRange1)) return [];
