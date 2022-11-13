@@ -6,24 +6,22 @@ import { scheduled } from './notification/scheduled.service';
 
 const app = express();
 
-app.use('/daily', async (req, res) => {
-    try {
-        await scheduled();
-        await alertDaily();
-        res.status(200).json({ status: 200 });
-    } catch (err) {
-        res.status(500).json({ err });
-    }
+app.use('/alert/daily', (req, res) => {
+    alertDaily()
+        .then((ok) => res.status(200).json({ ok }))
+        .catch((err) => res.status(500).json({ err }));
 });
 
-app.use('/weekly', async (req, res) => {
+app.use('/alert/weekly', (req, res) => {
     alertWeekly()
-        .then(() => {
-            res.status(200).json({ status: 200 });
-        })
-        .catch((err) => {
-            res.status(500).json({ err });
-        });
+        .then((ok) => res.status(200).json({ ok }))
+        .catch((err) => res.status(500).json({ err }));
+});
+
+app.use('/scheduled', (req, res) => {
+    scheduled()
+        .then((ok) => res.status(200).json({ ok }))
+        .catch((err) => res.status(500).json({ err }));
 });
 
 http('main', app);
