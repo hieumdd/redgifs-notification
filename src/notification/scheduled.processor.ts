@@ -7,8 +7,8 @@ import {
     getDataForMetric,
 } from '../analytics-data/analytics-data.service';
 import { numberFormatter, percentageFormatter } from './notification.service';
-import { MetricKey } from '../analytics-data/metric.enum';
-import { MetricOptions } from './notification.interface';
+import { MetricKey } from './metric.enum';
+import { MetricOptions } from './interface';
 
 type SingleMetricValue = [number, number, number];
 

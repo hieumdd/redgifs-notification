@@ -9,7 +9,7 @@ import {
     sortDimensionValue,
 } from '../analytics-data/analytics-data.service';
 import { percentageFormatter } from './notification.service';
-import { MetricOptions } from './notification.interface';
+import { MetricOptions } from './interface';
 
 export const [compareEvent, compareMetric] = [
     getDataForDimension,
