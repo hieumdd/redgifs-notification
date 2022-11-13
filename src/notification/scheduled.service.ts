@@ -1,4 +1,4 @@
-import { MetricKey, MetricName, EventKey } from '../analytics-data/metric.enum';
+import { MetricKey, MetricName, EventKey } from './metric.enum';
 import { TODAY, YESTERDAY, THIS_MONTH } from './date-range.const';
 import { getReports } from './report.service';
 import {
