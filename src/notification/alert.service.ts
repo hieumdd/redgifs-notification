@@ -109,10 +109,13 @@ export const [alertDaily, alertWeekly] = (() => {
             active7DayUsers,
             totalUsers,
             totalUsersReddit,
+
             loggedInUsers,
             loggedInUsersReddit,
+
             gifViews,
             gifViewsReddit,
+            
             topTag,
             topTagReddit,
         ].map((text) => createPlainTextSection(text));

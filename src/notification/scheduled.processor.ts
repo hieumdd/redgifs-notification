@@ -85,7 +85,7 @@ export const reportTopDimension = (
     const dimensions = (rows || [])
         .slice(1, 4)
         .map((row) => [
-            [...(row.dimensionValues || [])].pop()?.value,
+            (row.dimensionValues || [])[0].value,
             [...(row.metricValues || [])].pop()?.value,
         ])
         .map(

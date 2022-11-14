@@ -46,9 +46,7 @@ export const getTopDimension = (
         .map((index) => getDataForDateRange(response, index))
         .map((rows) => chain(rows).sortBy(sortDimensionValue).reverse().value())
         .map((rows) => rows.slice(1, 4))
-        .map((rows) =>
-            rows.map((row) => [...(row.dimensionValues || [])].pop()?.value),
-        );
+        .map((rows) => rows.map((row) => (row.dimensionValues || [])[0].value));
 
     // if (isEqual(dateRange0, dateRange1)) return [];
 
