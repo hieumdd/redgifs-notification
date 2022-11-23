@@ -2,7 +2,7 @@ import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
 
 const client = new WebClient(process.env.SLACK_TOKEN);
 
-const channel = 'C04AGMYPH3K';
+const channel = 'C04CC1SDTK3';
 
 export const createPlainTextSection = (text: string) => ({
     type: 'section',
