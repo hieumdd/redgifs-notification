@@ -45,7 +45,7 @@ const createMetricStatement = (
 
     const prettyToday = numberFormatter.format(today);
 
-    return `${metricOptions.name} is ${prettyToday}, ${todayOverYesterday} from yesterday and ${todayOverLastWeek} last week`;
+    return `${metricOptions.name} is ${prettyToday}, ${todayOverYesterday} from yesterday and ${todayOverLastWeek} average of last 28 days`;
 };
 
 export const [reportEvent, reportMetric] = [
